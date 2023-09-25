@@ -1,0 +1,425 @@
+---
+title: "Breast Health Decisions Tool Validation Study Manuscript"
+output: html_document
+---
+Import data
+```{r}
+setwd("~/Documents/Research/BHD Tool Validation Study Manuscript 2022/Codes")
+bhd_feedback <- read.csv("Feedback-Alone-BHD-Tool-manuscript-2022.04.28.csv")
+bhd_followup <- read.csv("Followup-Alone-BHD-Tool-manuscript-2022.04.28.csv")
+
+# merge feedback and follow up 
+merged <- merge(bhd_feedback, bhd_followup, by = "mrn")
+
+```
+Demographics
+```{r}
+# Total numbers
+sum(bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") #221
+sum(bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") #97
+
+# All participants (N = 318)
+## Age
+mean(bhd_feedback$Age.at.baseline..Dated.If.Function, na.rm = TRUE) ##average age = 57.8
+sd(bhd_feedback$Age.at.baseline..Dated.If.Function, na.rm = TRUE)
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="40"&bhd_feedback$Age.at.baseline..Dated.If.Function<"50"&bhd_feedback$Flagged.=="Good to go") #71
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="50"&bhd_feedback$Age.at.baseline..Dated.If.Function<"60"&bhd_feedback$Flagged. == "Good to go") #106
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="60"&bhd_feedback$Age.at.baseline..Dated.If.Function<"70"&bhd_feedback$Flagged. == "Good to go") #103
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="70"&bhd_feedback$Age.at.baseline..Dated.If.Function<"80"&bhd_feedback$Flagged. == "Good to go") #39
+
+# BMI
+sum(bhd_feedback$bmi < "18.5", na.rm = TRUE)
+sum(bhd_feedback$bmi >= "18.5" & bhd_feedback$bmi<"25", na.rm = TRUE)
+sum(bhd_feedback$bmi >="25" & bhd_feedback$bmi<"30", na.rm=TRUE)
+sum(bhd_feedback$bmi>="30", na.rm=TRUE)
+as.numeric(bhd_feedback$bmi) 
+mean(bhd_feedback$bmi, na.rm = TRUE) ##average BMI = 25.2
+
+## race/ethnicity = white = 242
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "White" & bhd_feedback$Flagged. == "Good to go") #284
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Hispanic" & bhd_feedback$Flagged. == "Good to go") #6
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Black or African American"& bhd_feedback$Flagged. == "Good to go") #5
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Asian" & bhd_feedback$Flagged. == "Good to go") #5
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Prefer not to answer" & bhd_feedback$Flagged. == "Good to go") #1
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Two or More Races" & bhd_feedback$Flagged. == "Good to go") #13
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Some other race" & bhd_feedback$Flagged. == "Good to go") #3
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Native Hawaiian or Other Pacific Islander" & bhd_feedback$Flagged. == "Good to go")
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "No Response" & bhd_feedback$Flagged. == "Good to go")
+
+# High risk (N = 221)
+## Age
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="40"&bhd_feedback$Age.at.baseline..Dated.If.Function<"50"&bhd_feedback$Flagged.=="Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR") #64
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="50"&bhd_feedback$Age.at.baseline..Dated.If.Function<"60"&bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR") #72
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="60"&bhd_feedback$Age.at.baseline..Dated.If.Function<"70"&bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR") #53
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="70"&bhd_feedback$Age.at.baseline..Dated.If.Function<"80"&bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR") #32
+
+## BMI, average BMI = 25.3
+sum(bhd_feedback$bmi < "18.5" & bhd_feedback$risk.level == "OneYearMR", na.rm = TRUE)
+sum(bhd_feedback$bmi >= "18.5" & bhd_feedback$bmi<"25"& bhd_feedback$risk.level == "OneYearMR", na.rm = TRUE)
+sum(bhd_feedback$bmi >="25" & bhd_feedback$bmi<"30" & bhd_feedback$risk.level == "OneYearMR", na.rm=TRUE)
+sum(bhd_feedback$bmi>="30" & bhd_feedback$risk.level == "OneYearMR", na.rm=TRUE)
+
+## Race/ethnicity
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "White" & bhd_feedback$Flagged. == "Good to go" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR") #196
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Hispanic" & bhd_feedback$Flagged. == "Good to go"& bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR") # 5
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Black or African American"& bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR") #5
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Asian" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR")
+#2
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Prefer not to answer" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR")
+#1
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Two or More Races" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR")
+#10
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Some other race" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR")
+#1
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Native Hawaiian or Other Pacific Islander" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR")
+
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "No Response" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR")
+
+## education level
+sum(bhd_feedback$EDUCATION.AT.BASELINE == "High school graduate" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR") #7
+sum(bhd_feedback$EDUCATION.AT.BASELINE == "Some college or technical school" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR") #41
+sum(bhd_feedback$EDUCATION.AT.BASELINE == "College graduate or more" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="OneYearMR")
+#173
+
+# Highest risk
+## age
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="40"&bhd_feedback$Age.at.baseline..Dated.If.Function<"50"&bhd_feedback$Flagged.=="Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth") #
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="50"&bhd_feedback$Age.at.baseline..Dated.If.Function<"60"&bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth") #
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="60"&bhd_feedback$Age.at.baseline..Dated.If.Function<"70"&bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth") #
+sum(bhd_feedback$Age.at.baseline..Dated.If.Function>="70"&bhd_feedback$Age.at.baseline..Dated.If.Function<"80"&bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth") #
+# high - BMI 
+sum(bhd_feedback$bmi < "18.5" & bhd_feedback$risk.level == "SixMonth", na.rm = TRUE)
+sum(bhd_feedback$bmi >= "18.5" & bhd_feedback$bmi<"25"& bhd_feedback$risk.level == "SixMonth", na.rm = TRUE)
+sum(bhd_feedback$bmi >="25" & bhd_feedback$bmi<"30" & bhd_feedback$risk.level == "SixMonth", na.rm=TRUE)
+sum(bhd_feedback$bmi>="30" & bhd_feedback$risk.level == "SixMonth", na.rm=TRUE)
+## high - race/ethnicity
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "White" & bhd_feedback$Flagged. == "Good to go" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth") #196
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Hispanic" & bhd_feedback$Flagged. == "Good to go"& bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth") # 5
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Black or African American"& bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth") #5
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Asian" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth")
+#2
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Prefer not to answer" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth")
+#1
+sum(bhd_feedback$RECODED.Baseline.RACE.ETHNICITY..USE.THIS == "Two or More Races" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth")
+
+## education level
+sum(bhd_feedback$EDUCATION.AT.BASELINE == "High school graduate" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth") #2
+sum(bhd_feedback$EDUCATION.AT.BASELINE == "Some college or technical school" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth") #23
+sum(bhd_feedback$EDUCATION.AT.BASELINE == "College graduate or more" & bhd_feedback$Flagged. == "Good to go"&bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date=="SixMonth")
+#71
+
+```
+Feedback survey
+```{r}
+# FEEDBACK SURVEY
+# Everyone:
+## helpful in understanding breast cancer risk
+### strongly agree = 148
+sum((bhd_feedback$understand.risk == "Strongly agree" | bhd_feedback$understand.risk == "Extremely helpful") & bhd_feedback$Flagged. == "Good to go")
+### agree = 175
+sum(bhd_feedback$understand.risk == "Somewhat helpful" | bhd_feedback$understand.risk == "Very helpful")
+### neutral
+### disagree = 0
+sum(bhd_feedback$understand.risk == "Disagree")
+### strongly disagree = 4
+sum(bhd_feedback$understand.risk == "Strongly disagree")
+
+## High risk:
+sum((bhd_feedback$understand.risk == "Strongly agree" | bhd_feedback$understand.risk == "Extremely helpful") & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR")
+### agree = 119
+sum((bhd_feedback$understand.risk == "Somewhat helpful" | bhd_feedback$understand.risk == "Very helpful") & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR")
+### neutral
+### strongly disagree = 3
+sum(bhd_feedback$understand.risk == "Strongly disagree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR")
+
+## Highest risk:
+# strongly agree = 49
+sum((bhd_feedback$understand.risk == "Strongly agree" | bhd_feedback$understand.risk == "Extremely helpful") & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth")
+# agree = 47
+sum((bhd_feedback$understand.risk == "Somewhat helpful" | bhd_feedback$understand.risk == "Very helpful") & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth")
+# neutral
+# disagree = 1
+sum(bhd_feedback$understand.risk == "Strongly disagree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth")
+
+# Worries/anxiety
+# Everyone:
+sum(bhd_feedback$eased.worries == "Strongly agree") #38
+sum(bhd_feedback$eased.worries == "Agree") #107
+sum(bhd_feedback$eased.worries == "Neutral") #129
+sum(bhd_feedback$eased.worries == "Disagree") #44
+sum(bhd_feedback$eased.worries == "Strongly disagree") #10
+
+# High risk:
+sum(bhd_feedback$eased.worries == "Strongly agree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") #23
+sum(bhd_feedback$eased.worries == "Agree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") #72
+sum(bhd_feedback$eased.worries == "Neutral" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") #83
+sum(bhd_feedback$eased.worries == "Disagree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") #30
+sum(bhd_feedback$eased.worries == "Strongly disagree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") #8
+# Highest risk: 
+sum(bhd_feedback$eased.worries == "Strongly agree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") #14
+sum(bhd_feedback$eased.worries == "Agree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") #30
+sum(bhd_feedback$eased.worries == "Neutral" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") #39
+sum(bhd_feedback$eased.worries == "Disagree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") #12 
+sum(bhd_feedback$eased.worries == "Strongly disagree" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") #2
+
+## Current risk reducing activities
+# High risk
+sum(bhd_feedback$reduce.med.current == "Taking medication that reduces my risk" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+sum(bhd_feedback$reduce.alcohol.current == "Decreasing alcohol intake" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+sum(bhd_feedback$reduce.exercise.current == "Increasing exercise" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+sum(bhd_feedback$reduce.weight.current == "Losing weight" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+sum(bhd_feedback$reduce.other.current == "Other" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+sum(bhd_feedback$reduce.nothing.current == "Nothing at this time" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+# Highest risk 
+sum(bhd_feedback$reduce.med.current == "Taking medication that reduces my risk" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+sum(bhd_feedback$reduce.alcohol.current == "Decreasing alcohol intake" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+sum(bhd_feedback$reduce.exercise.current == "Increasing exercise" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+sum(bhd_feedback$reduce.weight.current == "Losing weight" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+sum(bhd_feedback$reduce.other.current == "Other" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+sum(bhd_feedback$reduce.nothing.current == "Nothing at this time" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+
+# Considering risk reducing activities 
+## High risk
+sum(bhd_feedback$reduce.med.consider == "Taking medication that reduces my risk" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+sum(bhd_feedback$reduce.alcohol.consider == "Decreasing alcohol intake" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR")
+sum(bhd_feedback$reduce.exercise.consider == "Increasing exercise" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+sum(bhd_feedback$reduce.weight.consider == "Losing weight" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+sum(bhd_feedback$reduce.other.consider == "Other" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+sum(bhd_feedback$reduce.nothing.consider == "Nothing at this time" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+## Highest risk 
+sum(bhd_feedback$reduce.med.consider == "Taking medication that reduces my risk" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+sum(bhd_feedback$reduce.alcohol.consider == "Decreasing alcohol intake" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth")
+sum(bhd_feedback$reduce.exercise.consider == "Increasing exercise" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+sum(bhd_feedback$reduce.weight.consider == "Losing weight" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+sum(bhd_feedback$reduce.other.consider == "Other" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+sum(bhd_feedback$reduce.nothing.consider == "Nothing at this time" & bhd_feedback$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+```
+Follow up survey
+```{r}
+sum(merged$Screening.Assignment..Merged== "OneYearMR") #72
+sum(merged$Screening.Assignment..Merged == "SixMonth") #37
+
+# thought about chances of developing breast cancer
+## high risk
+sum(merged$thought.chances == "19509|3760|19509|Often" & merged$Screening.Assignment..Merged == "OneYearMR") #6
+sum(merged$thought.chances == "19508|3760|19508|Sometimes" & merged$Screening.Assignment..Merged == "OneYearMR" ) #45
+sum(merged$thought.chances == "19507|3760|19507|Not at all" & merged$Screening.Assignment..Merged== "OneYearMR") #21
+#high risk
+sum(merged$thought.chances == "19509|3760|19509|Often" & merged$Screening.Assignment..Merged == "SixMonth")# 4
+sum(merged$thought.chances == "19508|3760|19508|Sometimes" & merged$Screening.Assignment..Merged == "SixMonth" ) #25
+sum(merged$thought.chances == "19507|3760|19507|Not at all" & merged$Screening.Assignment..Merged == "SixMonth") #7
+
+# Worries about chances
+## high risk
+sum(merged$worried.chances == "19513|3761|19513|Often" & merged$Screening.Assignment..Merged == "OneYearMR") #3
+sum(merged$worried.chances == "19512|3761|19512|Sometimes" & merged$Screening.Assignment..Merged == "OneYearMR") #35
+sum(merged$worried.chances == "19511|3761|19511|Not at all" & merged$Screening.Assignment..Merged == "OneYearMR") #34
+# high risk
+sum(merged$worried.chances == "19513|3761|19513|Often" & merged$Screening.Assignment..Merged == "SixMonth") 
+sum(merged$worried.chances == "19512|3761|19512|Sometimes" & merged$Screening.Assignment..Merged == "SixMonth")
+sum(merged$worried.chances == "19511|3761|19511|Not at all" & merged$Screening.Assignment..Merged == "SixMonth") 
+
+# discussed how to reduce breast cancer risk with healthcare provider 
+sum(merged$discussed == "19521|3763|19521|Yes" & merged$Screening.Assignment..Merged == "OneYearMR") 
+sum(merged$discussed == "19521|3763|19521|Yes" & merged$Screening.Assignment..Merged == "SixMonth") 
+# provider recommended...
+sum(merged$recommended.med == "1|3765|19527|Risk reducing medication (or chemoprevention)", na.rm = TRUE) 
+sum(merged$recommended.alcohol. == "1|3765|19528|Decreasing alcohol intake", na.rm = TRUE) 
+sum(merged$recommended.exercise == "1|3765|19529|Increasing exercise", na.rm = TRUE) 
+sum(merged$recommended.weight == "1|3765|19530|Losing weight", na.rm = TRUE) 
+sum(merged$recommended.other == "1|3765|19531|Other", na.rm = TRUE ) 
+sum(merged$recommended.nothing == "1|3765|19532|Nothing at this time", na.rm = TRUE) 
+ 
+# moderate risk
+sum(merged$recommended.med == "1|3765|19527|Risk reducing medication (or chemoprevention)" & merged$Screening.Assignment..Merged == "OneYearMR", na.rm = TRUE)
+sum(merged$recommended.alcohol == "1|3765|19528|Decreasing alcohol intake" & merged$Screening.Assignment..Merged == "OneYearMR", na.rm = TRUE) 
+sum(merged$recommended.exercise == "1|3765|19529|Increasing exercise" & merged$Screening.Assignment..Merged == "OneYearMR", na.rm = TRUE) 
+sum(merged$recommended.weight == "1|3765|19530|Losing weight" & merged$Screening.Assignment..Merged == "OneYearMR", na.rm = TRUE) 
+sum(merged$recommended.other == "1|3765|19531|Other" & merged$Screening.Assignment..Merged == "OneYearMR", na.rm = TRUE ) 
+sum(merged$recommended.nothing == "1|3765|19532|Nothing at this time" & merged$Screening.Assignment..Merged == "OneYearMR", na.rm = TRUE) 
+# high risk
+sum(merged$recommended.med == "1|3765|19527|Risk reducing medication (or chemoprevention)" & merged$Screening.Assignment..Merged == "SixMonth", na.rm = TRUE) 
+sum(merged$recommended.alcohol == "1|3765|19528|Decreasing alcohol intake" & merged$Screening.Assignment..Merged == "SixMonth", na.rm = TRUE) 
+sum(merged$recommended.exercise == "1|3765|19529|Increasing exercise" & merged$Screening.Assignment..Merged == "SixMonth", na.rm = TRUE) 
+sum(merged$recommended.weight == "1|3765|19530|Losing weight" & merged$Screening.Assignment..Merged == "SixMonth", na.rm = TRUE) 
+sum(merged$recommended.other == "1|3765|19531|Other" & merged$Screening.Assignment..Merged == "SixMonth", na.rm = TRUE )
+sum(merged$recommended.nothing == "1|3765|19532|Nothing at this time" & merged$Screening.Assignment..Merged == "SixMonth", na.rm = TRUE) 
+
+# current risk reducing activities
+## high risk
+### nothing - *the rest
+### meds 
+sum(merged$using.med == "19546|3770|19546|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR")
+###alcohol
+sum(merged$using.alcohol == "19600|3784|19600|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+###exercise
+sum(merged$using.exericse == "19580|3779|19580|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR")
+###diet
+sum(merged$using.diet == "19566|3775|19566|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+###support services?
+sum(merged$support.services == "19619|3788|19619|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "OneYearMR") 
+
+## highest risk
+### nothing - *the rest
+### meds = 5
+sum(merged$using.med == "19546|3770|19546|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth")
+### alcohol = 16
+sum(merged$using.alcohol == "19600|3784|19600|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+### exercise = 19
+sum(merged$using.exericse == "19580|3779|19580|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth")
+### diet = 26
+sum(merged$using.diet == "19566|3775|19566|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+### support services? = 17
+sum(merged$support.services == "19619|3788|19619|Yes" & merged$TW.RS..Screening.Assignment.at.Survey..Completed.Date == "SixMonth") 
+```
+Compare feedback and follow up survey
+```{r}
+## Meds
+sum(merged$reduce.med.consider == "Taking medication that reduces my risk") #61
+sum(merged$reduce.med.consider != "Taking medication that reduces my risk") #48
+# did not consider and not currently doing
+sum(merged$reduce.med.consider != "Taking medication that reduces my risk" & merged$using.med == "19545|3770|19545|No", na.rm = TRUE) #43
+# did not consider and currently doing
+sum((merged$reduce.med.consider != "Taking medication that reduces my risk") & (merged$using.med == "19546|3770|19546|Yes")) #4
+# considered and not currently doing
+sum(merged$reduce.med.consider == "Taking medication that reduces my risk" & merged$using.med =="19545|3770|19545|No", na.rm = TRUE) #53
+# considered and currently doing
+sum((merged$reduce.med.consider == "Taking medication that reduces my risk") & (merged$using.med == "19546|3770|19546|Yes")) #8
+
+## Alcohol
+sum(merged$reduce.alcohol.consider == "Decreasing alcohol intake") #16
+sum(merged$reduce.alcohol.consider != "Decreasing alcohol intake") #93
+
+# did not consider and not currently doing
+sum(merged$reduce.alcohol.consider != "Decreasing alcohol intake" & merged$using.alcohol == "19599|3784|19599|No") #61
+# did not consider and currently doing
+sum(merged$reduce.alcohol.consider != "Decreasing alcohol intake" & merged$using.alcohol == "19600|3784|19600|Yes") #21
+# considered and not currently doing
+sum(merged$reduce.alcohol.consider == "Decreasing alcohol intake" & merged$using.alcohol == "19599|3784|19599|No") #4
+# considered and currently doing
+sum(merged$reduce.alcohol.consider == "Decreasing alcohol intake" & merged$using.alcohol == "19600|3784|19600|Yes") #6
+
+## Exercise
+sum(merged$reduce.exercise.consider == "Increasing exercise") #24
+sum(merged$reduce.exercise.consider != "Increasing exercise") #85
+sum(merged$using.exericse == "19580|3779|19580|Yes") #53
+# did not consider and not currently doing
+sum(merged$reduce.exercise.consider != "Increasing exercise" & merged$using.exericse == "19579|3779|19579|No") #45
+# did not consider and currently doing
+sum(merged$reduce.exercise.consider != "Increasing exercise" & merged$using.exericse == "19580|3779|19580|Yes") #39
+# considered and not currently doing
+sum(merged$reduce.exercise.consider == "Increasing exercise" & merged$using.exericse == "19579|3779|19579|No") #10
+# considered and currently doing
+sum(merged$reduce.exercise.consider == "Increasing exercise" & merged$using.exericse == "19580|3779|19580|Yes") #14
+```
+Graphs
+```{r} 
+library(ggplot2)
+## med use
+risk.group <- gl(2,1,4,labels=c("High risk", "Highest risk"))
+time.frame <- gl(2,2,labels=c("Currently doing", "Considering"))
+percentage3 <- c(9.7,8.2,32.6,39.2)
+med.dataframe <- data.frame(riskgroup = risk.group, timeframe = time.frame, percentage = percentage3)
+ggplot(data=med.dataframe, aes(x = timeframe, y = percentage, fill = riskgroup))+geom_bar(stat="identity",position=position_dodge())+ylab("% in risk group") + xlab("Feedback survey response for endocrine risk reduction") + ggtitle("") + theme(legend.position = "top",legend.title = element_blank()) + scale_fill_manual(values = c("skyblue4", "royalblue"))+ 
+theme(axis.text.x = element_text(face = "bold", size = 14), plot.title = element_text(hjust = 0.5, face = "bold"), text = element_text(size = 15, family = "Times New Roman"))  
+
+## alcohol
+risk.group <- gl(2,1,4,labels=c("High risk", "Highest risk"))
+time.frame <- gl(2,2,labels=c("Currently doing", "Considering"))
+percentage4 <- c(33.5,50.5,14.9,14.4)
+alcohol.dataframe <- data.frame(riskgroup = risk.group, timeframe=time.frame,percentage = percentage4)
+ggplot(data=alcohol.dataframe, aes(x = timeframe, y = percentage, fill = riskgroup))+geom_bar(stat="identity",position=position_dodge())+ylab("% in risk group") + xlab("Feedback survey response for alcohol reduction") + ggtitle("") + theme(legend.position = "top",legend.title = element_blank()) + scale_fill_manual(values = c("skyblue4", "royalblue"))+ 
+theme(axis.text.x = element_text(face = "bold", size = 14), 
+        plot.title = element_text(hjust = 0.5, face = "bold"), text = element_text(size = 15, family = "Times New Roman")) 
+
+## exercise
+risk.group <- gl(2,1,4,labels=c("High risk", "Highest risk"))
+time.frame <- gl(2,2,labels=c("Currently doing", "Considering"))
+percentage5 <- c(60.2,68,34.4,22.7)
+exercise.dataframe <- data.frame(riskgroup=risk.group,timeframe=time.frame,percentage=percentage5)
+ggplot(data=exercise.dataframe, aes(x = timeframe, y = percentage, fill = riskgroup))+geom_bar(stat="identity",position=position_dodge())+ylab("% in risk group") + xlab("Feedback survey response for exercise increase") + ggtitle("") + theme(legend.position = "top",legend.title = element_blank()) + scale_fill_manual(values = c("skyblue4", "royalblue"))+ 
+  theme(axis.text.x = element_text(face = "bold", size = 14), 
+        plot.title = element_text(hjust = 0.5, face = "bold"), text = element_text(size = 15, family = "Times New Roman")) 
+
+## Tool eased my anxiety 
+rating <- gl(5, 1, 10, labels = c("Strongly agree", "Agree", "Neutral", "Disagree", "Strongly disagree"), 2)
+risk.level <- gl(2, 5, labels = c("High Risk", "Highest Risk"))
+percentage <- c(10.4,32.6,37.6,13.5,3.6,14.4,30.9,40.2,12.4,2.1)
+anxiety.frame <- data.frame(rating = rating, risklevel = risk.level, percentage = percentage)
+
+ggplot(anxiety.frame, aes(x = rating, y = percentage, fill = risklevel)) + geom_bar(stat = "identity", position = position_dodge()) + ylab("Percentage in risk group") + xlab("Tool helped breast cancer anxiety") + theme(legend.position = "top", legend.title = element_blank()) + scale_fill_manual(values = c("skyblue4", "royalblue"))+ 
+  theme(axis.text.x = element_text(face = "bold", size = 14), 
+        plot.title = element_text(hjust = 0.5, face = "bold"), text = element_text(size = 15, family = "Times New Roman")) 
+
+## Worried about developing breast cancer
+rating2 <- gl(3, 1, 6, labels = c("Often", "Sometimes", "Not at all"), 2)
+riskgroup <- gl(2, 3, labels = c("High risk", "Highest risk"))
+percentage2 <- c(4.2,48.6,47.2,8.1,48.6,40.5)
+worries.dataframe <- data.frame(rating = rating2, riskgroup = riskgroup, percentage = percentage2)
+
+ggplot(worries.dataframe, aes(x = rating, y = percentage, fill = riskgroup)) + geom_bar(stat = "identity", position = position_dodge()) + ylab("Percentage in risk group") + xlab("Frequency of breast cancer worry (within 3 months after tool)") + theme(legend.position = "top", legend.title = element_blank()) + scale_fill_manual(values = c("skyblue4", "royalblue"))+ 
+  theme(axis.text.x = element_text(face = "bold", size = 14), 
+        plot.title = element_text(hjust = 0.5, face = "bold"), text = element_text(size = 15, family = "Times New Roman"))  
+```
+Chi Square analyses
+```{r}
+## Difference between chemoprevention use
+chemo_modhigh_post <- matrix(c(7,5,65,32), ncol = 2, byrow = TRUE)  
+colnames(chemo_modhigh_post) <- c("high", "highest")
+rownames(chemo_modhigh_post) <- c("yes", "no")
+View(chemo_modhigh_post)
+chemo_modhigh_post <- as.table(chemo_modhigh_post)
+chisq.test(chemo_modhigh_post)
+## Difference between alcohol use 
+alcohol_modhigh_post <- matrix(c(26,16,46,21), ncol = 2, byrow = TRUE)  
+colnames(alcohol_modhigh_post) <- c("high", "highest")
+rownames(alcohol_modhigh_post) <- c("yes", "no")
+View(alcohol_modhigh_post)
+alcohol_modhigh_post <- as.table(alcohol_modhigh_post)
+chisq.test(alcohol_modhigh_post)
+## Difference between exercise 
+exercise_modhigh_post <- matrix(c(34,19,38,18), ncol = 2, byrow = TRUE)  
+colnames(exercise_modhigh_post) <- c("high", "highest")
+rownames(exercise_modhigh_post) <- c("yes", "no")
+View(exercise_modhigh_post)
+exercise_modhigh_post <- as.table(exercise_modhigh_post)
+chisq.test(exercise_modhigh_post)
+
+# Considering - chemo
+chemo_modhigh_cons <- matrix(c(72,38,149,59), ncol = 2, byrow = TRUE)  
+colnames(chemo_modhigh_cons) <- c("high", "highest")
+rownames(chemo_modhigh_cons) <- c("yes", "no")
+View(chemo_modhigh_cons)
+chemo_modhigh_cons<- as.table(chemo_modhigh_cons)
+chisq.test(chemo_modhigh_cons)
+# Considering - alcohol
+alcohol_modhigh_cons <- matrix(c(33,14,188,83), ncol = 2, byrow = TRUE)  
+colnames(alcohol_modhigh_cons) <- c("high", "highest")
+rownames(alcohol_modhigh_cons) <- c("yes", "no")
+View(alcohol_modhigh_cons)
+alcohol_modhigh_cons<- as.table(alcohol_modhigh_cons)
+chisq.test(alcohol_modhigh_cons)
+# Considering - exercise
+exercise_modhigh_cons <- matrix(c(76,22,145,75), ncol = 2, byrow = TRUE)  
+colnames(exercise_modhigh_cons) <- c("high", "highest")
+rownames(exercise_modhigh_cons) <- c("yes", "no")
+View(exercise_modhigh_cons)
+exercise_modhigh_cons<- as.table(exercise_modhigh_cons)
+chisq.test(exercise_modhigh_cons)
+
+# Healthcare provider rec chemoprevention
+chemo_provider_rec <- matrix(c(11,8,61,29), ncol = 2, byrow=TRUE)
+colnames(chemo_provider_rec) <- c("high", "highest")
+rownames(chemo_provider_rec)
+View(chemo_provider_rec)
+chisq.test(chemo_provider_rec)
+# Healthcare provider rec alcohol
+alcohol_provider_rec <- matrix(c(9,6,63,31), ncol = 2, byrow=TRUE)
+chisq.test(alcohol_provider_rec)
+# Healthcare provider rec exercise
+exercise_provider_rec <- matrix(c(11,11,61,26), ncol = 2, byrow=TRUE)
+chisq.test(exercise_provider_rec)
+# Healthcare provider discussed risk
+discussed_provider_rec <- matrix(c(50,30,22,7), ncol = 2, byrow=TRUE)
+chisq.test(discussed_provider_rec)
+```
